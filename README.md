@@ -1,2 +1,2 @@
-# DeltaList
+# CodecList
 Compressed Random Access List
