@@ -7,59 +7,59 @@ The list of numbers below might be stored as a simnple array of 4 byte integers 
 
 | Index  | Value |
 | ------:|------:|
-| 0      | 1000  |
-| 1      | 1003  |
-| 2      | 1005  |
-| 3      | 1002  |
-| 4      | 995   |
-| 5      | 998   |
-| 6      | 1001  |
+| *0*      | 1000  |
+| *1*      | 1003  |
+| *2*      | 1005  |
+| *3*      | 1002  |
+| *4*      | 995   |
+| *5*      | 998   |
+| *6*      | 1001  |
 
 Since the numbers only change by a small amount each time we could store just the first element (1000) as a 4 byte integer (`int` or `Int32` in C#) and encode each remaining number as an offset from this first element in a single signed byte (`sbyte` in C#).
 
 | Index  | Value | Offset |
 | ------:|------:|-------:|
-| 0      | 1000  | 0      |
-| 1      | 1003  | +3      |
-| 2      | 1005  | +5      |
-| 3      | 1002  | +2      |
-| 4      | 995   | -5      |
-| 5      | 998   | -2      |
-| 6      | 1001  | +1      |
+| *0*      | 1000  | 0      |
+| *1*      | 1003  | +3      |
+| *2*      | 1005  | +5      |
+| *3*      | 1002  | +2      |
+| *4*      | 995   | -5      |
+| *5*      | 998   | -2      |
+| *6*      | 1001  | +1      |
 
 A signed byte in [two's complement](https://en.wikipedia.org/wiki/Two%27s_complement) can range from -128 to +127 which means we can only represent numbers that far from the first number. To solve this problem we can introduce the concept of a *key frame* (the name borrowed from the idea of a [key frame](https://en.wikipedia.org/wiki/Key_frame) in video compression) to store a new starting point every time the numbers move outside of the representable range.
 
 | Index  | Value | KeyFrame | Offset |
 | ------:|------:|---------:|-------:|
-| 0      | 1000  | 1000     | 0      |
-| 1      | 1003  |          | +3     |
-| 2      | 1005  |          | +5     |
-| 3      | 1002  |          | +2     |
-| 4      | 995   |          | -5     |
-| 5      | 998   |          | -2     |
-| 6      | 1001  |          | +1     |
-| 7      | 1150  | 1150     | 0      |
-| 8      | 1145  |          | -5     |
+| *0*      | 1000  | 1000     | 0      |
+| *1*      | 1003  |          | +3     |
+| *2*      | 1005  |          | +5     |
+| *3*      | 1002  |          | +2     |
+| *4*      | 995   |          | -5     |
+| *5*      | 998   |          | -2     |
+| *6*      | 1001  |          | +1     |
+| *7*      | 1150  | 1150     | 0      |
+| *8*      | 1145  |          | -5     |
 
 We can therefore encode this list of numbers with two lists.
 
 #### Key Frames
 | Index | Key | Value |
 | -----:| ---:| -----:|
-| 0     | 0   | 1000  |
-| 1     | 7   | 1150  |
+| *0*     | 0   | 1000  |
+| *1*     | 7   | 1150  |
 
 #### Offsets
 | Index  | Offset |
 | ------:|-------:|
-| 0      | 0      |
-| 1      | +3     |
-| 2      | +5     |
-| 3      | +2     |
-| 4      | -5     |
-| 5      | -2     |
-| 6      | +1     |
-| 7      | 0      |
-| 8      | -5     |
+| *0*      | 0      |
+| *1*      | +3     |
+| *2*      | +5     |
+| *3*      | +2     |
+| *4*      | -5     |
+| *5*      | -2     |
+| *6*      | +1     |
+| *7*      | 0      |
+| *8*      | -5     |
 
 
