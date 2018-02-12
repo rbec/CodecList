@@ -41,7 +41,7 @@ A signed byte in [two's complement](https://en.wikipedia.org/wiki/Two%27s_comple
 | *7*      | 1150  | 1150     | 0      |
 | *8*      | 1145  |          | -5     |
 
-We can therefore encode this list of numbers with two lists - one for the key frames and one for the offsets. Each key frame consists of a 4 byte integer specifying the index in the original array from which it applies and a value that needs to be added to the subsequent offsets.
+We can therefore encode this list of numbers with two lists - one for the key frames and one for the offsets. Each key frame consists of a 4 byte integer specifying the index in the original array from which it applies and a 4 byte value that needs to be added to the subsequent offsets.
 
 #### Key Frames
 | Index | Key | Value |
