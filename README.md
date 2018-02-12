@@ -3,7 +3,7 @@ A custom data structure in C# implementing `IReadOnlyList<T>` with reduced memor
 ## Motivation
 Sometimes a list of numbers changes only slowly over the indexes of the list, even though the possible range of values remains large. For example a stock price ticker may take any currency value, but two consecutive ticks will typically only differ by a few cents. This presents an opportunity for compression. The aim of this class is to provide a good trade off between space and speed of access for certain use cases.
 ## Example
-The list of numbers below might be stored as a simnple array of 4 byte integers per element:
+The list of numbers below might be stored as a simnple array of 4 byte integers per element.
 
 | Index  | Value |
 | ------:|------:|
@@ -40,3 +40,26 @@ A signed byte in [two's complement](https://en.wikipedia.org/wiki/Two%27s_comple
 | 6      | 1001  |          | +1     |
 | 7      | 1150  | 1150     | 0      |
 | 8      | 1145  |          | -5     |
+
+We can therefore encode this list of numbers with two lists.
+
+#### Key Frames
+| Index | Key | Value |
+| -----:| ---:| -----:|
+| 0     | 0   | 1000  |
+| 1     | 7   | 1150  |
+
+#### Offsets
+| Index  | Offset |
+| ------:|-------:|
+| 0      | 0      |
+| 1      | +3     |
+| 2      | +5     |
+| 3      | +2     |
+| 4      | -5     |
+| 5      | -2     |
+| 6      | +1     |
+| 7      | 0      |
+| 8      | -5     |
+
+
