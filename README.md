@@ -3,7 +3,7 @@ A custom data structure in C# implementing `IReadOnlyList<T>` with reduced memor
 ## Motivation
 Sometimes a list of numbers changes only slowly over the indexes of the list, even though the possible range of values remains large. For example a stock price ticker may take any currency value, but two consecutive ticks will typically only differ by a few cents. This presents an opportunity for compression. The aim of this class is to provide a good trade off between space and speed of access for certain use cases.
 ## Example
-The list of numbers below might be stored as a simnple array of 4 byte integers per element.
+The list of numbers below might be stored as a simple array of 4 byte integers per element.
 
 | Index  | Value |
 | ------:|------:|
