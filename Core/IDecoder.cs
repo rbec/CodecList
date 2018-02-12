@@ -1,7 +1,7 @@
 ﻿namespace Rbec.CodecList
 {
-    public interface IDecoder<T, in TCode>
+    public interface IDecoder<T, in TOffset>
     {
-        T Decode(T keyValue, TCode code);
+        T Decode(T keyValue, TOffset offset);
     }
 }

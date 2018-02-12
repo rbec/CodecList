@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core.csproj", "{EF154965-B7FC-4466-88FE-B5D975BD3EBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rbec", "Rbec.csproj", "{EF154965-B7FC-4466-88FE-B5D975BD3EBC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +18,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {18773FC9-2373-4C70-8BFF-9EEC36161ED3}
 	EndGlobalSection
 EndGlobal
