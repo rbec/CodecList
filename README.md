@@ -41,7 +41,7 @@ A signed byte in [two's complement](https://en.wikipedia.org/wiki/Two%27s_comple
 | *7*      | 1150  | 1150     | 0      |
 | *8*      | 1145  |          | -5     |
 
-We can therefore encode this list of numbers with two lists.
+We can therefore encode this list of numbers with two lists - one for the key frames and one for the offsets. Each key frame consists of a 4 byte integer specifying the index in the original array from which it applies and a value that needs to be added to the subsequent offsets.
 
 #### Key Frames
 | Index | Key | Value |
@@ -62,4 +62,34 @@ We can therefore encode this list of numbers with two lists.
 | *7*      | 0      |
 | *8*      | -5     |
 
+## Implementation
+Our implementation need not tie us to specific types of key frame or offsets. We can use the C# type system to generalise the idea to any type `T` in `IReadOnlyList<T>` with any type of offset `TOffset`. Let's define some interfaces to abstract this concept out from the implementation itself.
+```C#
+public interface IDecoder<T, in TOffset>
+{
+    T Decode(T keyValue, TOffset offset);
+}
 
+public interface ICodec<T, TOffset> : IDecoder<T, TOffset>
+{
+    TOffset Default { get; }
+    bool TryEncode(T value, T keyValue, out TOffset offset);
+}
+```
+The example above using `int` and `sbyte` would be implemented like this:
+
+``` C#
+public struct Int32SByteCodec : ICodec<int, sbyte>
+{
+    public sbyte Default => 0;
+
+    public bool TryEncode(int value, int keyValue, out sbyte offset)
+    {
+        var difference = value - keyValue;
+        offset = (sbyte) difference;
+        return difference >= sbyte.MinValue && difference <= sbyte.MaxValue;
+    }
+
+    public int Decode(int keyValue, sbyte offset) => keyValue + offset;
+}
+```
