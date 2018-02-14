@@ -72,7 +72,6 @@ public interface IDecoder<T, in TOffset>
 
 public interface ICodec<T, TOffset> : IDecoder<T, TOffset>
 {
-    TOffset Default { get; }
     bool TryEncode(T value, T keyValue, out TOffset offset);
 }
 ```
@@ -81,8 +80,6 @@ The example above using `int` and `sbyte` would be implemented like this:
 ``` C#
 public struct Int32SByteCodec : ICodec<int, sbyte>
 {
-    public sbyte Default => 0;
-
     public bool TryEncode(int value, int keyValue, out sbyte offset)
     {
         var difference = value - keyValue;
