@@ -90,6 +90,27 @@ public struct Int32SByteCodec : ICodec<int, sbyte>
     public int Decode(int keyValue, sbyte offset) => keyValue + offset;
 }
 ```
+Using this we can implement `IReadOnlyList<T>`:
+``` C#
+public CodecList<T, TOffset, TDecoder> : IReadOnlyList<T>
+{
+    public ITimeSeries<int, T> KeyFrames;
+    public IReadOnlyList<TOffset> Offsets;
+}
+
+public interface ITimeSeries<TKey, TValue> : IReadyOnlyList<KeyValuePair<TKey, TValue>>
+{
+    IReadOnlyList<TKey> Keys { get; } // must be ordered and increasing
+    IReadOnlyList<TValue> Values { get; }
+}
+```
+Specifying `TDecoder` as a generic type parameter constrained to be a struct allows a C# performance trick to be used. Since out implementation if `IDecoder` does not reference any internal state or fields, all instances will behave alike, including `default(TDecoder)`. We don't need to pass it in as a parameter and because it's a struct the compiler can inline the method calls.
+
+#### Implementation of `GetEnumerator()`
+
+#### Implementation of `this[int index] { get; }`
+
+##### Example
 
 | Index  | Value | KeyFrame | Offset |
 | ------:|------:|---------:|-------:|
@@ -104,3 +125,9 @@ public struct Int32SByteCodec : ICodec<int, sbyte>
 | > ***8***  | **1145**  |          | **-5**     |
 | *9*      | 800   | 800      | 0      |
 | *10*     | 1000  | 1000     | 0     |
+
+To find the element at index 8 we need the offset at index 8 (-5) which can be looked up directly by index in the `Offsets` list. We also need to find the applicable key frame. In this case it's the 3rd key frame (at index 2) which applies to offsets starting from index 7. Since our key frames are ordered by the index from which they apply we can use a binary search. Specifically we want to find the last key frame with a key less than or equal to 8:
+
+``` C#
+var keyFrameIndex = KeyFrames.Keys.UpperBound(index) - 1;
+```
