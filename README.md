@@ -15,7 +15,7 @@ The list of numbers below might be stored as a simple array of 4 byte integers p
 | *5*      | 998   |
 | *6*      | 1001  |
 
-Since the numbers only change by a small amount each time we could store just the first element (1000) as a 4 byte integer (`int` or `Int32` in C#) and encode each remaining number as an offset from this first element in a single signed byte (`sbyte` in C#).
+Since the numbers only change by a small amount each time we could store just the first element (1000) as a 4 byte integer (`int` in C#) and encode each remaining number as an offset from this first element in a single signed byte (`sbyte` in C#).
 
 | Index  | Value | Offset |
 | ------:|------:|-------:|
@@ -93,3 +93,17 @@ public struct Int32SByteCodec : ICodec<int, sbyte>
     public int Decode(int keyValue, sbyte offset) => keyValue + offset;
 }
 ```
+
+| Index  | Value | KeyFrame | Offset |
+| ------:|------:|---------:|-------:|
+| *0*      | 1000  | 1000     | 0      |
+| *1*      | 1003  |          | +3     |
+| *2*      | 1005  |          | +5     |
+| *3*      | 1002  |          | +2     |
+| *4*      | 995   |          | -5     |
+| *5*      | 998   |          | -2     |
+| *6*      | 1001  |          | +1     |
+| *7*      | 1150  | 1150     | 0      |
+| ***8***  | **1145**  |          | **-5**     |
+| *9*      | 800   | 800      | 0      |
+| *10*     | 1000  | 1000     | 0     |
