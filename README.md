@@ -200,3 +200,4 @@ public struct Int32ByteCodec : ICodec<int, byte>
     public int Decode(int keyValue, byte offset) => keyValue + offset;
 }
 ```
+This can be used to encode timestamps of trades, which are always non-decreasing.
