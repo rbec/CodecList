@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Rbec.CodecList
+namespace Rbec
 {
     public static class ListExtensions
     {

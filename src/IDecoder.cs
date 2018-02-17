@@ -1,4 +1,4 @@
-﻿namespace Rbec.CodecList
+﻿namespace Rbec
 {
     public interface IDecoder<T, in TOffset>
     {

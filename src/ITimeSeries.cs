@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Rbec.CodecList
+namespace Rbec
 {
     public interface ITimeSeries<TKey, TValue> : IReadOnlyList<KeyValuePair<TKey, TValue>>
     {

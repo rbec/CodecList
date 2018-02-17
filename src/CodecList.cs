@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace Rbec.CodecList
+namespace Rbec
 {
     public sealed class CodecList<T, TOffset, TDecoder> : IReadOnlyList<T>
         where TDecoder : struct, IDecoder<T, TOffset>

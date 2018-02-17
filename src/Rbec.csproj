@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>Rbec.CodecList</AssemblyName>
-    <RootNamespace>Rbec.CodecList</RootNamespace>
+    <AssemblyName>Rbec</AssemblyName>
+    <RootNamespace>Rbec</RootNamespace>
   </PropertyGroup>
 
 </Project>

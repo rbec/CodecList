@@ -1,4 +1,4 @@
-﻿namespace Rbec.CodecList.Codecs
+﻿namespace Rbec.Codecs
 {
     public struct Int32ByteCodec : ICodec<int, byte>
     {
