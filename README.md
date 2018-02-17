@@ -15,7 +15,7 @@ The list of numbers below might be stored as a simple array of 4 byte integers p
 | *5*      | 998   |
 | *6*      | 1001  |
 
-Since the numbers only change by a small amount each time we could store just the first element (1000) as a 4 byte integer (`int` in C#) and encode each remaining number as an offset from this first element in a single signed byte (`sbyte` in C#).
+Since the numbers only change by a small amount each time we could store just the first element (`1000`) as a 4 byte integer (`int` in C#) and encode each remaining number as an offset from this first element in a single signed byte (`sbyte` in C#).
 
 | Index  | Value | Offset |
 | ------:|------:|-------:|
@@ -27,7 +27,7 @@ Since the numbers only change by a small amount each time we could store just th
 | *5*      | 998   | -2      |
 | *6*      | 1001  | +1      |
 
-A signed byte in [two's complement](https://en.wikipedia.org/wiki/Two%27s_complement) can range from -128 to +127 which means we can only represent numbers that far from the first number. To solve this problem we can introduce the concept of a *key frame* (the name borrowed from the idea of a [key frame](https://en.wikipedia.org/wiki/Key_frame) in video compression) to store a new starting point every time the numbers move outside of the representable range.
+A signed byte in [two's complement](https://en.wikipedia.org/wiki/Two%27s_complement) can range from `-128` to `+127` which means we can only represent numbers that far from the first number. To solve this problem we can introduce the concept of a *key frame* (the name borrowed from the idea of a [key frame](https://en.wikipedia.org/wiki/Key_frame) in video compression) to store a new starting point every time the numbers move outside of the representable range.
 
 | Index  | Value | KeyFrame | Offset |
 | ------:|------:|---------:|-------:|
@@ -107,7 +107,26 @@ public interface ITimeSeries<TKey, TValue> : IReadyOnlyList<KeyValuePair<TKey, T
 Specifying `TDecoder` as a generic type parameter constrained to be a struct allows a C# performance trick to be used. Since out implementation if `IDecoder` does not reference any internal state or fields, all instances will behave alike, including `default(TDecoder)`. We don't need to pass it in as a parameter and because it's a struct the compiler can inline the method calls.
 
 #### Implementation of `GetEnumerator()`
+``` C#
+public IEnumerator<T> GetEnumerator()
+{
+    var lastValue = default(T);
 
+    var i = 0;
+    var j = 0;
+
+    while (i < KeyFrames.Count && j < Offsets.Count)
+    {
+        if (KeyFrames.Keys[i] == j)
+            lastValue = KeyFrames.Values[i++];
+        yield return default(TDecoder).Decode(lastValue, Offsets[j++]);
+    }
+
+    while (j < Offsets.Count)
+        yield return default(TDecoder).Decode(lastValue, Offsets[j++]);
+}
+```
+If there is no key frame at the start (index `0`) we will assume the first offset is from `default(T)`.
 #### Implementation of `this[int index] { get; }`
 
 ##### Example
@@ -126,8 +145,58 @@ Specifying `TDecoder` as a generic type parameter constrained to be a struct all
 | *9*      | 800   | 800      | 0      |
 | *10*     | 1000  | 1000     | 0     |
 
-To find the element at index 8 we need the offset at index 8 (-5) which can be looked up directly by index in the `Offsets` list. We also need to find the applicable key frame. In this case it's the 3rd key frame (at index 2) which applies to offsets starting from index 7. Since our key frames are ordered by the index from which they apply we can use a binary search. Specifically we want to find the last key frame with a key less than or equal to 8:
+To find the element at index `8` we need the offset at index `8` (`-5`) which can be looked up directly by index in the `Offsets` list. We also need to find the applicable key frame. In this case it's the 3rd key frame (at index `2`) which applies to offsets starting from index `7`. Since our key frames are ordered by the index from which they apply we can use a binary search. Specifically we want to find the last key frame with a key less than or equal to `8`:
 
 ``` C#
 var keyFrameIndex = KeyFrames.Keys.UpperBound(index) - 1;
+```
+`UpperBound` is a variantion of binary search that returns the first index of an element that is greater than the search value. It is [implemented in the C++ standard library](http://www.cplusplus.com/reference/algorithm/upper_bound/) but not in C#. Here is an implementation in C#
+``` C#
+public static int BinarySearch<T>(this IReadOnlyList<T> list, Func<T, bool> predicate, int start, int count)
+{
+    while (count > 0)
+    {
+        var delta = count >> 1;
+        if (!predicate(list[start + delta]))
+            start += count - delta;
+        count -= count - delta;
+    }
+    return start;
+}
+
+public static int UpperBound<T>(this IReadOnlyList<T> list, T key, int start, int count)
+{
+    return list.BinarySearch(element => Comparer<T>.Default.Compare(key, element) < 0, start, count);
+}
+```
+Define a function that returns the key frame value to be added to the offset at a given index:
+``` C#
+private T KeyValue(int index)
+{
+    return (index = KeyFrames.Keys.UpperBound(index)) == 0
+                ? default(T)
+                : KeyFrames.Values[index - 1];
+}
+```
+Finally we can use this to implement the indexer.
+``` C#
+public T this[int index]
+{
+    get { return default(TDecoder).Decode(KeyValue(index), Offsets[index]); }
+}
+```
+### Encoding Increasing Integers
+If the difference between successive elements is non-negative (i.e. it is increasing) we can save more key frames by using the offset as a `byte` rather than `sbyte` allowing differences between `0` and `255`.
+``` C#
+public struct Int32ByteCodec : ICodec<int, byte>
+{
+    public bool TryEncode(int value, int keyValue, out byte offset)
+    {
+        var difference = value - keyValue;
+        offset = (byte) difference;
+        return difference >= byte.MinValue && difference <= byte.MaxValue;
+    }
+
+    public int Decode(int keyValue, byte offset) => keyValue + offset;
+}
 ```
