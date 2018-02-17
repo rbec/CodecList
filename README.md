@@ -104,7 +104,7 @@ public interface ITimeSeries<TKey, TValue> : IReadyOnlyList<KeyValuePair<TKey, T
     IReadOnlyList<TValue> Values { get; }
 }
 ```
-Specifying `TDecoder` as a generic type parameter constrained to be a struct allows a C# performance trick to be used. Since out implementation if `IDecoder` does not reference any internal state or fields, all instances will behave alike, including `default(TDecoder)`. We don't need to pass it in as a parameter and because it's a struct the compiler can inline the method calls.
+Specifying `TDecoder` as a generic type parameter constrained to be a struct allows a C# performance trick to be used. Since our implementation of `IDecoder` does not reference any internal state or fields, all instances will behave alike, including `default(TDecoder)`. We don't need to pass it in as a parameter and because it's a struct the compiler can inline the method calls.
 
 #### Implementation of `GetEnumerator()`
 ``` C#
@@ -200,3 +200,4 @@ public struct Int32ByteCodec : ICodec<int, byte>
     public int Decode(int keyValue, byte offset) => keyValue + offset;
 }
 ```
+This can be used to encode timestamps of trades, which are always non-decreasing.
