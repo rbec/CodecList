@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace Rbec.CodecList
 {
-    public sealed class CodecList<T, TCode, TDecoder> : IReadOnlyList<T>
-        where TDecoder : struct, IDecoder<T, TCode>
+    public sealed class CodecList<T, TOffset, TDecoder> : IReadOnlyList<T>
+        where TDecoder : struct, IDecoder<T, TOffset>
     {
         public readonly ITimeSeries<int, T> KeyFrames;
-        public readonly IReadOnlyList<TCode> Deltas;
+        public readonly IReadOnlyList<TOffset> Offsets;
 
-        public CodecList(ITimeSeries<int, T> keyFrames, IReadOnlyList<TCode> deltas)
+        public CodecList(ITimeSeries<int, T> keyFrames, IReadOnlyList<TOffset> offsets)
         {
             KeyFrames = keyFrames;
-            Deltas = deltas;
+            Offsets = offsets;
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -22,29 +22,33 @@ namespace Rbec.CodecList
             var i = 0;
             var j = 0;
 
-            while (i < KeyFrames.Count && j < Deltas.Count)
+            while (i < KeyFrames.Count && j < Offsets.Count)
             {
                 if (KeyFrames.Keys[i] == j)
                     lastValue = KeyFrames.Values[i++];
-                yield return default(TDecoder).Decode(lastValue, Deltas[j++]);
+                yield return default(TDecoder).Decode(lastValue, Offsets[j++]);
             }
 
-            while (j < Deltas.Count)
-                yield return default(TDecoder).Decode(lastValue, Deltas[j++]);
+            while (j < Offsets.Count)
+                yield return default(TDecoder).Decode(lastValue, Offsets[j++]);
         }
 
         IEnumerator IEnumerable.GetEnumerator() =>
             GetEnumerator();
 
         public int Count =>
-            Deltas.Count;
+            Offsets.Count;
 
-        public T this[int index] =>
-            default(TDecoder).Decode(KeyValue(index), Deltas[index]);
+        public T this[int index]
+        {
+            get { return default(TDecoder).Decode(KeyValue(index), Offsets[index]); }
+        }
 
-        private T KeyValue(int index) =>
-            (index = KeyFrames.UpperBound(index)) == 0
-                ? default(T)
-                : KeyFrames.Values[index - 1];
+        private T KeyValue(int index)
+        {
+            return (index = KeyFrames.Keys.UpperBound(index)) == 0
+                       ? default(T)
+                       : KeyFrames.Values[index - 1];
+        }
     }
 }
