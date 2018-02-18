@@ -39,16 +39,12 @@ namespace Rbec
         public int Count =>
             Offsets.Count;
 
-        public T this[int index]
-        {
-            get { return default(TDecoder).Decode(KeyValue(index), Offsets[index]); }
-        }
+        public T this[int index] =>
+            default(TDecoder).Decode(KeyValue(index), Offsets[index]);
 
-        private T KeyValue(int index)
-        {
-            return (index = KeyFrames.Keys.UpperBound(index)) == 0
-                       ? default(T)
-                       : KeyFrames.Values[index - 1];
-        }
+        private T KeyValue(int index) =>
+            (index = KeyFrames.Keys.UpperBound(index)) == 0
+                ? default(T)
+                : KeyFrames.Values[index - 1];
     }
 }
