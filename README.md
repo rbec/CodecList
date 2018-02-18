@@ -145,7 +145,7 @@ If there is no key frame at the start (index `0`) we will assume the first offse
 | *9*      | 800   | 800      | 0      |
 | *10*     | 1000  | 1000     | 0     |
 
-To find the element at index `8` we need the offset at index `8` (`-5`) which can be looked up directly by index in the `Offsets` list. We also need to find the applicable key frame. In this case it's the 3rd key frame (at index `2`) which applies to offsets starting from index `7`. Since our key frames are ordered by the index from which they apply we can use a binary search. Specifically we want to find the last key frame with a key less than or equal to `8`:
+To find the element at index `8` we need the offset at index `8` (`-5`) which can be looked up directly by index in the `Offsets` list. We also need to find the applicable key frame. In this case it's the 2nd key frame (at index `1`) which applies to offsets starting from index `7`. Since our key frames are ordered by the index from which they apply we can use a binary search. Specifically we want to find the last key frame with a key less than or equal to `8`:
 
 ``` C#
 var keyFrameIndex = KeyFrames.Keys.UpperBound(index) - 1;
