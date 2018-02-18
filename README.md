@@ -15,7 +15,7 @@ The list of numbers below might be stored as a simple array of 4 byte integers p
 | *5*      | 998   |
 | *6*      | 1001  |
 
-Since the numbers only change by a small amount each time we could store just the first element (`1000`) as a 4 byte integer (`int` in C#) and encode each remaining number as an offset from this first element in a single signed byte (`sbyte` in C#).
+Since the numbers only change by a small amount each time we could store just the first element (`1000`) as a 4 byte integer (`int` in C#) and encode each remaining number as an offset from this first element in a single signed byte (`sbyte`).
 
 | Index  | Value | Offset |
 | ------:|------:|-------:|
@@ -150,7 +150,7 @@ To find the element at index `8` we need the offset at index `8` (`-5`) which ca
 ``` C#
 var keyFrameIndex = KeyFrames.Keys.UpperBound(index) - 1;
 ```
-`UpperBound` is a variantion of binary search that returns the first index of an element that is greater than the search value. It is [implemented in the C++ standard library](http://www.cplusplus.com/reference/algorithm/upper_bound/) but not in C#. Here is an implementation in C#
+`UpperBound` is a variantion of binary search that returns the first index of an element that is greater than the search value. It is [implemented in the C++ standard library](http://www.cplusplus.com/reference/algorithm/upper_bound/) but not in C#. Here is an implementation in C#:
 ``` C#
 public static int BinarySearch<T>(this IReadOnlyList<T> list, Func<T, bool> predicate, int start, int count)
 {
@@ -178,7 +178,7 @@ private T KeyValue(int index)
                 : KeyFrames.Values[index - 1];
 }
 ```
-Finally we can use this to implement the indexer.
+Finally we can use this to implement the indexer:
 ``` C#
 public T this[int index]
 {
