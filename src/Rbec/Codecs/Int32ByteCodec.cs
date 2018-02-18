@@ -7,8 +7,13 @@
         public bool TryEncode(int value, int keyValue, out byte offset)
         {
             var difference = value - keyValue;
-            offset = (byte) difference;
-            return difference >= byte.MinValue && difference <= byte.MaxValue;
+            if (difference >= byte.MinValue && difference <= byte.MaxValue)
+            {
+                offset = (byte)difference;
+                return true;
+            }
+            offset = 0;
+            return false;
         }
 
         public int Decode(int keyValue, byte offset) => keyValue + offset;

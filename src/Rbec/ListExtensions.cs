@@ -37,10 +37,9 @@ namespace Rbec
                 if (!default(TCodec).TryEncode(element, last, out var offset))
                 {
                     keys.Add(offsets.Count);
-                    values.Add(element);
-                    last = element;
-                    offset = default(TOffset);
+                    values.Add(last = element);
                 }
+
                 offsets.Add(offset);
             }
 
