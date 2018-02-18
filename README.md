@@ -185,7 +185,35 @@ public T this[int index]
     get { return default(TDecoder).Decode(KeyValue(index), Offsets[index]); }
 }
 ```
-### Encoding Increasing Integers
+### Encoding
+We need a way to encode a list of elements in our compressed format. Using the `TryEncode` method on the `TCodec` interface:
+``` C#
+public static CodecList<T, TOffset, TCodec> ToCodecList<T, TOffset, TCodec>(this IEnumerable<T> elements)
+    where TCodec : struct, ICodec<T, TOffset>
+{
+    var offsets = new List<TOffset>();
+    var keys = new List<int>();
+    var values = new List<T>();
+
+    var last = default(T);
+    foreach (var element in elements)
+    {
+        if (!default(TCodec).TryEncode(element, last, out var offset))
+        {
+            keys.Add(offsets.Count);
+            values.Add(element);
+            last = element;
+            offset = default(TOffset);
+        }
+        offsets.Add(offset);
+    }
+
+    var keyFrames = new TimeSeries<int, T>(keys, values);
+
+    return new CodecList<T, TOffset, TCodec>(keyFrames, offsets);
+}
+```
+### Increasing Integer Sequences
 If the difference between successive elements is non-negative (i.e. it is increasing) we can save more key frames by using the offset as a `byte` rather than `sbyte` allowing differences between `0` and `255`.
 ``` C#
 public struct Int32ByteCodec : ICodec<int, byte>
