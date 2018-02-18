@@ -83,8 +83,13 @@ public struct Int32SByteCodec : ICodec<int, sbyte>
     public bool TryEncode(int value, int keyValue, out sbyte offset)
     {
         var difference = value - keyValue;
-        offset = (sbyte) difference;
-        return difference >= sbyte.MinValue && difference <= sbyte.MaxValue;
+        if (difference >= sbyte.MinValue && difference <= sbyte.MaxValue)
+        {
+            offset = (sbyte)difference;
+            return true;
+        }
+        offset = 0;
+        return false;
     }
 
     public int Decode(int keyValue, sbyte offset) => keyValue + offset;
@@ -201,9 +206,7 @@ public static CodecList<T, TOffset, TCodec> ToCodecList<T, TOffset, TCodec>(this
         if (!default(TCodec).TryEncode(element, last, out var offset))
         {
             keys.Add(offsets.Count);
-            values.Add(element);
-            last = element;
-            offset = default(TOffset);
+            values.Add(last = element);
         }
         offsets.Add(offset);
     }
@@ -221,8 +224,13 @@ public struct Int32ByteCodec : ICodec<int, byte>
     public bool TryEncode(int value, int keyValue, out byte offset)
     {
         var difference = value - keyValue;
-        offset = (byte) difference;
-        return difference >= byte.MinValue && difference <= byte.MaxValue;
+        if (difference >= byte.MinValue && difference <= byte.MaxValue)
+        {
+            offset = (byte)difference;
+            return true;
+        }
+        offset = 0;
+        return false;
     }
 
     public int Decode(int keyValue, byte offset) => keyValue + offset;
