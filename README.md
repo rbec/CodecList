@@ -98,6 +98,7 @@ public struct Int32SByteCodec : ICodec<int, sbyte>
 Using this we can implement `IReadOnlyList<T>`:
 ``` C#
 public CodecList<T, TOffset, TDecoder> : IReadOnlyList<T>
+    where TDecoder : struct, IDecoder<T, TOffset>
 {
     public ITimeSeries<int, T> KeyFrames;
     public IReadOnlyList<TOffset> Offsets;
